@@ -43,4 +43,18 @@ public class EmployeeService {
         else
             return "Invalid reporting manager";
     }
+
+    public String updateDepartmentId(int id, int deptId) {
+        Optional<Department> dept = deptRepository.findById(deptId);
+        if (dept.isEmpty())
+            return "Department does not exist";
+        Optional<Employee> employee = empRepository.findById(id);
+        if (employee.isPresent()){
+           Employee emp = employee.get();
+           empRepository.save(emp);
+        }
+        else
+            return "Employee does not exist";
+        return  "Department updated successfully";
+    }
 }

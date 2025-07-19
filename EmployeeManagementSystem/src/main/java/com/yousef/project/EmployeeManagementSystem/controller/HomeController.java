@@ -30,4 +30,10 @@ public class HomeController {
         else
             return new ResponseEntity<>(response,HttpStatus.INTERNAL_SERVER_ERROR);
     }
+    @PatchMapping("/update-employeedept/{id}")
+    public ResponseEntity<String> updateEmployeeDepartment(
+            @PathVariable("id") int id,@RequestParam("DeptId") int deptId) {
+        String response =employeeService.updateDepartmentId(id,deptId);
+        return new ResponseEntity<>(response,HttpStatus.OK);
+    }
 }
