@@ -8,6 +8,6 @@ import java.util.List;
 @Data
 public class DepartmentExpandResponse {
 
-     private Department department;
-     private List<Employee> employees;
+     private DepartmentResponse department;
+     private List<EmployeeResponse> employees;
 }

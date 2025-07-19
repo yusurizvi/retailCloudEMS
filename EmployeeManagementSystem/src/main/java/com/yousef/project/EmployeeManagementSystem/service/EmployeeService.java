@@ -1,17 +1,14 @@
 package com.yousef.project.EmployeeManagementSystem.service;
 
-import com.yousef.project.EmployeeManagementSystem.dto.DepartmentExpandResponse;
-import com.yousef.project.EmployeeManagementSystem.dto.DepartmentRequest;
-import com.yousef.project.EmployeeManagementSystem.dto.EmployeeRequest;
-import com.yousef.project.EmployeeManagementSystem.dto.EmployeeResponse;
+import com.yousef.project.EmployeeManagementSystem.dto.*;
 import com.yousef.project.EmployeeManagementSystem.model.Department;
 import com.yousef.project.EmployeeManagementSystem.model.Employee;
 import com.yousef.project.EmployeeManagementSystem.repository.DepartmentRepository;
 import com.yousef.project.EmployeeManagementSystem.repository.EmployeeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.yaml.snakeyaml.introspector.PropertyUtils;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,13 +32,21 @@ public class EmployeeService {
         return true;
     }
 
-    public List<Employee> getEmployeeDetails(boolean lookup) {
+    public List<EmployeeResponse> getEmployeeDetails(boolean lookup) {
 
-        if(lookup)
-        {
-            empRepository.getLookUpData();
-        }
-        return empRepository.findAll();
+//        if(lookup)
+//        {
+//            return empRepository.getLookUpData();
+//        }
+        return empRepository.findAll().stream().map(employee -> {
+            return EmployeeResponse.builder().name(employee.getName()).role(employee.getRole())
+                    .salary(String.valueOf(employee.getSalary())).address(employee.getAddress()).
+                    joiningDate(String.valueOf(employee.getJoiningDate())).
+                    reportingManager(employee.getReportingManager()!=null?employee.getReportingManager().getName():null).dateOfBirth(String.valueOf(employee.getDateOfBirth()))
+                    .bonusPercentage(String.valueOf(employee.getBonusPercentage()))
+                    .dept(employee.getDept()!=null?employee.getDept().getName():null)
+            .build();
+        }).toList();
     }
 
     public String addEmployee(EmployeeRequest request) {
@@ -64,8 +69,11 @@ public class EmployeeService {
             return "Invalid reporting manager";
     }
 
-    public List<Department> getAllDepartments() {
-    return deptRepository.findAll();
+    public List<DepartmentResponse> getAllDepartments() {
+    return deptRepository.findAll().stream().map(department -> {
+        return DepartmentResponse.builder().name(department.getName()).creationDate(department.getCreationDate())
+                .hod(department.getHod()!=null?String.valueOf(department.getHod().getId()):null).build();
+    }).toList();
     }
 
     public String updateEmployee(EmployeeRequest request, String id) {
@@ -123,25 +131,40 @@ public class EmployeeService {
         DepartmentExpandResponse response = new DepartmentExpandResponse();
         if(dept.isEmpty())
             throw new Exception("Department does not exist");
-        if(expand.equals("Employee"))
-        {
-            Optional<List<Employee>> employeeList = empRepository.findAllByDept(dept.get().getDept_id());
-            if(employeeList.isEmpty()) {
+        if(expand.equals("Employee")) {
+            Optional<List<Employee>> employeeList = empRepository.findAllByDept(dept.get());
+            if (employeeList.isEmpty()) {
                 response.setEmployees(null);
             }
-            response.setEmployees(employeeList.get());
+            List<EmployeeResponse> employeeResponseList = employeeList.get().stream().map(employee -> {
+                return EmployeeResponse.builder().name(employee.getName())
+                        .dept(String.valueOf(employee.getDept().getDept_id()))
+                        .role(employee.getRole()).joiningDate(String.valueOf(employee.getJoiningDate()))
+                        .salary(String.valueOf(employee.getSalary())).address(String.valueOf(employee.getAddress()))
+                        .dateOfBirth(String.valueOf(employee.getDateOfBirth())).bonusPercentage(String.valueOf(employee.getBonusPercentage())).
+                        reportingManager(employee.getReportingManager()!=null?String.valueOf(employee.getReportingManager().getId()):null)
+                        .build();
+            }).toList();
+            response.setEmployees(employeeResponseList);
         }
-        response.setDepartment(dept.get());
+        response.setDepartment(
+                DepartmentResponse.builder().name(dept.get().getName()).creationDate(dept.get().getCreationDate())
+                        .hod(String.valueOf(dept.get().getHod()!=null?dept.get().getHod().getId():null)).build()
+        );
         return response;
     }
 
     public String deleteDepartment(int id) {
-        try{
-            empRepository.deleteByDept(id);
-            deptRepository.deleteById(id);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        return "Department deleted successfully";
+            Optional<Department> dept = deptRepository.findById(Integer.valueOf(id));
+            if(dept.isPresent())
+            {
+                empRepository.deleteByDept(dept.get());
+                deptRepository.deleteById(id);
+                return "Department deleted successfully";
+            }
+            else
+                return "Department does not exist";
+
+//        return "Department deleted successfully";
     }
 }

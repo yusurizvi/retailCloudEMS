@@ -1,8 +1,6 @@
 package com.yousef.project.EmployeeManagementSystem.controller;
 
-import com.yousef.project.EmployeeManagementSystem.dto.DepartmentExpandResponse;
-import com.yousef.project.EmployeeManagementSystem.dto.DepartmentRequest;
-import com.yousef.project.EmployeeManagementSystem.dto.EmployeeRequest;
+import com.yousef.project.EmployeeManagementSystem.dto.*;
 import com.yousef.project.EmployeeManagementSystem.model.Department;
 import com.yousef.project.EmployeeManagementSystem.model.Employee;
 import com.yousef.project.EmployeeManagementSystem.service.EmployeeService;
@@ -21,7 +19,7 @@ public class HomeController {
     private final EmployeeService employeeService;
 
     @GetMapping("/Employee-details")
-    public List<Employee> getEmployee(@RequestParam(required = false) Boolean lookup) {
+    public List<EmployeeResponse> getEmployee(@RequestParam(required = false) Boolean lookup) {
         return employeeService.getEmployeeDetails(lookup);
 
     }
@@ -40,8 +38,8 @@ public class HomeController {
                 :new ResponseEntity<>("Invalid Reporting Manager",HttpStatus.INTERNAL_SERVER_ERROR);
     }
     @GetMapping("/get-Departments")
-    public ResponseEntity<List<Department>>getDepartments() {
-        List<Department> departmentList = employeeService.getAllDepartments();
+    public ResponseEntity<List<DepartmentResponse>>getDepartments() {
+        List<DepartmentResponse> departmentList = employeeService.getAllDepartments();
         return new ResponseEntity<>(departmentList, HttpStatus.OK);
     }
     @PutMapping("/update-emp/{id}")
