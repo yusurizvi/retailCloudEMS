@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class EmployeeResponse extends EmployeeLookUpResponse {
+public class EmployeeResponse {
     private  String name;
     private  String salary;
     private String dept;

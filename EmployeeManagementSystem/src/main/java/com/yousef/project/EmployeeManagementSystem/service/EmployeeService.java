@@ -32,12 +32,12 @@ public class EmployeeService {
         return true;
     }
 
-    public List<EmployeeResponse> getEmployeeDetails(boolean lookup) {
+    public List<?> getEmployeeDetails(boolean lookup) {
 
-//        if(lookup)
-//        {
-//            return empRepository.getLookUpData();
-//        }
+        if(lookup)
+        {
+            return empRepository.getLookUpData();
+        }
         return empRepository.findAll().stream().map(employee -> {
             return EmployeeResponse.builder().name(employee.getName()).role(employee.getRole())
                     .salary(String.valueOf(employee.getSalary())).address(employee.getAddress()).

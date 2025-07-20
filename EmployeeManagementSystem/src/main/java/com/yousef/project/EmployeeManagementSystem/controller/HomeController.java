@@ -19,7 +19,7 @@ public class HomeController {
     private final EmployeeService employeeService;
 
     @GetMapping("/Employee-details")
-    public List<EmployeeResponse> getEmployee(@RequestParam(required = false) Boolean lookup) {
+    public List<?> getEmployee(@RequestParam(required = false) Boolean lookup) {
         return employeeService.getEmployeeDetails(lookup);
 
     }
